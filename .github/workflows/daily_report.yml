@@ -1,7 +1,7 @@
 name: Kodal Daily Update
 on:
   schedule:
-    - cron: '00 17 * * 1-5' # Runs at 17:30 UTC, Mon-Fri
+    - cron: '45 16 * * 1-5' # Runs at 17:30 UTC, Mon-Fri
   workflow_dispatch:      # Allows you to run it manually for testing
 
 jobs:
