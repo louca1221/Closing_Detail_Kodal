@@ -44,14 +44,14 @@ def get_kod_report():
         f" *Kodal Minerals - Market Close Report*\n"
         f"-----------\n"
         f"{emoji} *Price:* {price}p ({change_pct:+.2f}%)\n"
-        f"📈 *Today's Volume:* {vol_today:,}\n"
-        f"📊 *10D Avg Vol:* {int(avg_vol_10d):,}\n"
         f"-----------\n"
-        f"🔘 *Volume Level:* {vol_trend}\n"
-        f"💰 *Total Value Traded:* £{total_value_gbp:,.2f}\n"
+        f"◽️ *Today's Volume:* {vol_today:,}\n"
+        f"◽️ *10D Avg Vol:* {int(avg_vol_10d):,}\n"
+        f"◽️ *Volume Level:* {vol_trend}\n"
+        f"◽️ *Total Value Traded:* £{total_value_gbp:,.2f}\n"
         f"-----------\n"
-        f"↕️ *Day Range:* {data.get('dayLow')}p - {data.get('dayHigh')}p\n"
-        f"🏢 *Market Cap:* £{mkt_cap}\n"
+        f"◽️ *Day Range:* {data.get('dayLow')}p - {data.get('dayHigh')}p\n"
+        f"◽️ *Market Cap:* £{mkt_cap}\n"
     )
     return report
 
