@@ -10,10 +10,19 @@ def get_kod_report():
     ticker = yf.Ticker("KOD.L")
     data = ticker.info
     
-    # Logic to handle missing data
+    # 1. Extract variables (Added day_low and day_high here)
     price = data.get('regularMarketPrice') or data.get('currentPrice') or "N/A"
     prev_close = data.get('previousClose', "N/A")
-    volume = data.get('regularMarketVolume', 0)
+    day_low = data.get('dayLow', "N/A")
+    day_high = data.get('dayHigh', "N/A")
+    
+    # 2. Handle volume safely so the :, formatting doesn't crash on None
+    volume_raw = data.get('regularMarketVolume') or 0
+    volume = f"{volume_raw:,}" if isinstance(volume_raw, int) else "N/A"
+    
+    # 3. Handle Market Cap safely
+    mkt_cap_raw = data.get('marketCap') or 0
+    mkt_cap = f"{mkt_cap_raw:,}" if isinstance(mkt_cap_raw, int) else "N/A"
     
     report = (
         f"📊 *Kodal Minerals (KOD.L) Update*\n"
@@ -21,8 +30,8 @@ def get_kod_report():
         f"💰 *Current Price:* {price}p\n"
         f"📉 *Prev Close:* {prev_close}p\n"
         f"↕️ *Day Range:* {day_low}p - {day_high}p\n"
-        f"📈 *Volume:* {volume:,}\n"
-        f"🏢 *Market Cap:* £{data.get('marketCap', 0):,}\n"
+        f"📈 *Volume:* {volume}\n"
+        f"🏢 *Market Cap:* £{mkt_cap}\n"
         f"--- --- --- --- --- --- ---\n"
         f"🕒 _Data from Yahoo Finance_"
     )
