@@ -23,11 +23,11 @@ def get_kod_report():
     # Calculate Volume Trend
     vol_ratio = (vol_today / avg_vol_10d) if avg_vol_10d > 0 else 0
     if vol_ratio > 1.5:
-        vol_trend = "🔥 High (Heavy Trading)"
+        vol_trend = "High"
     elif vol_ratio < 0.5:
-        vol_trend = "💤 Low (Quiet Day)"
+        vol_trend = "Low"
     else:
-        vol_trend = "✅ Normal"
+        vol_trend = "Normal"
 
     # Price Change
     change_pct = ((price - prev_close) / prev_close) * 100 if prev_close else 0
@@ -36,13 +36,18 @@ def get_kod_report():
     # Monetary Value (Price in p, so divide by 100 for £)
     total_value_gbp = (vol_today * price) / 100
 
+    # Handle Market Cap safely
+    mkt_cap_raw = data.get('marketCap') or 0
+    mkt_cap = f"{mkt_cap_raw:,}" if isinstance(mkt_cap_raw, int) else "N/A"
+
     report = (
-        f"📊 *Kodal Minerals (KOD.L) Daily Update*\n"
+        f" *Kodal Minerals (KOD.L) Daily Update*\n"
         f"--- --- --- --- --- --- ---\n"
         f"{emoji} *Price:* {price}p ({change_pct:+.2f}%)\n"
         f"📈 *Today's Volume:* {vol_today:,}\n"
         f"📊 *10D Avg Vol:* {int(avg_vol_10d):,}\n"
-        f"🎯 *Activity Level:* {vol_trend}\n"
+        f"🏢 *Market Cap:* £{mkt_cap}\n"
+        f"🔘 *Activity Level:* {vol_trend}\n"
         f"💰 *Total Value Traded:* £{total_value_gbp:,.2f}\n"
         f"↕️ *Day Range:* {data.get('dayLow')}p - {data.get('dayHigh')}p\n"
         f"--- --- --- --- --- --- ---\n"
