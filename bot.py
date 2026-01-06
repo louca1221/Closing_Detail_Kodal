@@ -17,10 +17,14 @@ def get_kod_report():
     
     report = (
         f"📊 *Kodal Minerals (KOD.L) Update*\n"
-        f"--- --- --- --- --- ---\n"
-        f"💰 Close: {price}p\n"
-        f"📉 Prev Close: {prev_close}p\n"
-        f"📈 Volume: {volume:,}\n"
+        f"--- --- --- --- --- --- ---\n"
+        f"💰 *Current Price:* {price}p\n"
+        f"📉 *Prev Close:* {prev_close}p\n"
+        f"↕️ *Day Range:* {day_low}p - {day_high}p\n"
+        f"📈 *Volume:* {volume:,}\n"
+        f"🏢 *Market Cap:* £{data.get('marketCap', 0):,}\n"
+        f"--- --- --- --- --- --- ---\n"
+        f"🕒 _Data from Yahoo Finance_"
     )
     return report
 
