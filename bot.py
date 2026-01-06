@@ -1,53 +1,67 @@
 import yfinance as yf
 import requests
 import os
+import pandas as pd
 
 TOKEN = os.getenv('TELEGRAM_TOKEN')
-CHAT_ID = os.getenv('CHAT_ID')
+CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 def get_kod_report():
     print("Fetching data for Kodal Minerals...")
     ticker = yf.Ticker("KOD.L")
+    
+    # Get current info
     data = ticker.info
+    price = data.get('regularMarketPrice') or data.get('currentPrice') or 0
+    prev_close = data.get('previousClose') or 0
+    vol_today = data.get('regularMarketVolume') or 0
     
-    # 1. Extract variables (Added day_low and day_high here)
-    price = data.get('regularMarketPrice') or data.get('currentPrice') or "N/A"
-    prev_close = data.get('previousClose', "N/A")
-    day_low = data.get('dayLow', "N/A")
-    day_high = data.get('dayHigh', "N/A")
+    # Get 10-day history for average volume
+    hist = ticker.history(period="15d") # Get 15 days to ensure we have 10 trading days
+    avg_vol_10d = hist['Volume'].tail(10).mean()
     
-    # 2. Handle volume safely so the :, formatting doesn't crash on None
-    volume_raw = data.get('regularMarketVolume') or 0
-    volume = f"{volume_raw:,}" if isinstance(volume_raw, int) else "N/A"
+    # Calculate Volume Trend
+    vol_ratio = (vol_today / avg_vol_10d) if avg_vol_10d > 0 else 0
+    if vol_ratio > 1.5:
+        vol_trend = "🔥 High (Heavy Trading)"
+    elif vol_ratio < 0.5:
+        vol_trend = "💤 Low (Quiet Day)"
+    else:
+        vol_trend = "✅ Normal"
+
+    # Price Change
+    change_pct = ((price - prev_close) / prev_close) * 100 if prev_close else 0
+    emoji = "🟢" if change_pct >= 0 else "🔴"
     
-    # 3. Handle Market Cap safely
-    mkt_cap_raw = data.get('marketCap') or 0
-    mkt_cap = f"{mkt_cap_raw:,}" if isinstance(mkt_cap_raw, int) else "N/A"
-    
+    # Monetary Value (Price in p, so divide by 100 for £)
+    total_value_gbp = (vol_today * price) / 100
+
     report = (
-        f"📊 *Kodal Minerals (KOD.L) Update*\n"
+        f"📊 *Kodal Minerals (KOD.L) Daily Update*\n"
         f"--- --- --- --- --- --- ---\n"
-        f"💰 *Current Price:* {price}p\n"
-        f"📉 *Prev Close:* {prev_close}p\n"
-        f"↕️ *Day Range:* {day_low}p - {day_high}p\n"
-        f"📈 *Volume:* {volume}\n"
-        f"🏢 *Market Cap:* £{mkt_cap}\n"
+        f"{emoji} *Price:* {price}p ({change_pct:+.2f}%)\n"
+        f"📈 *Today's Volume:* {vol_today:,}\n"
+        f"📊 *10D Avg Vol:* {int(avg_vol_10d):,}\n"
+        f"🎯 *Activity Level:* {vol_trend}\n"
+        f"💰 *Total Value Traded:* £{total_value_gbp:,.2f}\n"
+        f"↕️ *Day Range:* {data.get('dayLow')}p - {data.get('dayHigh')}p\n"
         f"--- --- --- --- --- --- ---\n"
-        f"🕒 _Data from Yahoo Finance_"
+        f"🕒 _LSE Market Close Report_"
     )
     return report
 
 def send_telegram_msg(text):
     if not TOKEN or not CHAT_ID:
-        print("ERROR: Missing TOKEN or CHAT_ID in GitHub Secrets!")
+        print("Missing Credentials")
         return
-
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     payload = {"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"}
-    
-    response = requests.post(url, data=payload)
-    print(f"Telegram Response: {response.status_code} - {response.text}")
+    r = requests.post(url, data=payload)
+    print(f"Status: {r.status_code}")
 
 if __name__ == "__main__":
-    report_text = get_kod_report()
-    send_telegram_msg(report_text)
+    try:
+        msg = get_kod_report()
+        send_telegram_msg(msg)
+    except Exception as e:
+        print(f"Error: {e}")
