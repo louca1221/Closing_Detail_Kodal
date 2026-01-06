@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 TOKEN = os.getenv('TELEGRAM_TOKEN')
-CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+CHAT_ID = os.getenv('CHAT_ID')
 
 def get_kod_report():
     print("Fetching data for Kodal Minerals...")
