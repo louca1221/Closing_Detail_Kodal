@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 TOKEN = os.getenv('TELEGRAM_TOKEN')
-CHAT_ID = os.getenv('CHAT_ID')  # Ensure this matches your GitHub Secret name
+CHAT_ID = os.getenv('CHAT_ID') 
 MS_KEY = os.getenv('MARKETSTACK_KEY')
 
 def get_marketstack_price():
@@ -12,11 +12,9 @@ def get_marketstack_price():
     if not MS_KEY:
         print("Marketstack Key missing.")
         return None
-        
     try:
-        # 1. Use XLON for London Stock Exchange
-        # 2. Use http (not https) for Free Plan compatibility
-        url = f"http://api.marketstack.com/v1/eod/latest?access_key={MS_KEY}&symbols=KOD.L"
+        # Use XLON for London Stock Exchange & http for Free Plan compatibility
+        url = f"http://api.marketstack.com/v1/eod/latest?access_key={MS_KEY}&symbols=KOD.XLON"
         response = requests.get(url)
         data_json = response.json()
         
@@ -35,10 +33,7 @@ def get_kod_report():
     print("Fetching data...")
     ticker = yf.Ticker("KOD.L")
     
-    # Get Marketstack Price first
     ms_price = get_marketstack_price()
-    
-    # Get Yahoo Data for everything else
     y_data = ticker.info
     
     # Logic: Use Marketstack price if available, otherwise use Yahoo
@@ -52,22 +47,23 @@ def get_kod_report():
     hist = ticker.history(period="15d")
     avg_vol_10d = hist['Volume'].tail(10).mean()
     vol_ratio = (vol_today / avg_vol_10d) if avg_vol_10d > 0 else 0
-    vol_trend = "High" if vol_ratio > 1.5 else "Low" if vol_ratio < 0.5 else "Good"
+    vol_trend = "High 🔥" if vol_ratio > 1.5 else "Low 💤" if vol_ratio < 0.5 else "Normal ✅"
 
     change_pct = ((price - prev_close) / prev_close) * 100 if prev_close else 0
     emoji = "🟢" if change_pct >= 0 else "🔴"
     total_value_gbp = (vol_today * price) / 100
     mkt_cap = f"{y_data.get('marketCap', 0):,}"
 
+    # FIXED: Corrected the unclosed asterisk/parenthesis on the volume trend line
     report = (
         f"*Kodal Minerals (KOD.L) Report*\n"
         f"-----------\n"
         f"{emoji} *Price:* {price}p ({change_pct:+.2f}%)\n"
         f"*Source:* {price_source}\n"
         f"-----------\n"
-        f"◽️ *Todays Volume:* {vol_today:,}\n"
+        f"◽️ *Today's Volume:* {vol_today:,}\n"
         f"◽️ *10D Avg:* {int(avg_vol_10d):,}\n"
-        f"◽️ *({vol_trend})\n"
+        f"◽️ *Activity:* {vol_trend}\n"
         f"◽️ *Market Cap:* £{mkt_cap}\n"
         f"-----------\n"
         f"◽️ *Value Traded:* £{total_value_gbp:,.2f}\n"
@@ -78,13 +74,21 @@ def get_kod_report():
 
 def send_telegram_msg(text):
     if not TOKEN or not CHAT_ID:
-        print(f"Missing Credentials: TOKEN={'Set' if TOKEN else 'MISSING'}, CHAT_ID={'Set' if CHAT_ID else 'MISSING'}")
+        print("Missing Credentials")
         return
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     payload = {"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"}
     r = requests.post(url, data=payload)
-    print(f"Telegram Send Status: {r.status_code}")
+    
+    # This will print the exact reason if Telegram rejects the message again
+    if r.status_code != 200:
+        print(f"❌ Telegram Error {r.status_code}: {r.text}")
+    else:
+        print("✅ Message sent successfully!")
 
 if __name__ == "__main__":
-    msg = get_kod_report()
-    send_telegram_msg(msg)
+    try:
+        msg = get_kod_report()
+        send_telegram_msg(msg)
+    except Exception as e:
+        print(f"Global Error: {e}")
