@@ -52,6 +52,7 @@ def get_kod_report():
     hist = ticker.history(period="15d")
     avg_vol_10d = hist['Volume'].tail(10).mean()
     vol_ratio = (vol_today / avg_vol_10d) if avg_vol_10d > 0 else 0
+    vol_trend = "High" if vol_ratio > 1.5 else "Low" if vol_ratio < 0.5 else "Good"
 
     change_pct = ((price - prev_close) / prev_close) * 100 if prev_close else 0
     emoji = "🟢" if change_pct >= 0 else "🔴"
@@ -66,9 +67,11 @@ def get_kod_report():
         f"-----------\n"
         f"◽️ *Todays Volume:* {vol_today:,}\n"
         f"◽️ *10D Avg:* {int(avg_vol_10d):,}\n"
+        f"◽️ *({vol_trend})\n"
+        f"◽️ *Market Cap:* £{mkt_cap}\n"
         f"-----------\n"
         f"◽️ *Value Traded:* £{total_value_gbp:,.2f}\n"
-        f"◽️ *Market Cap:* £{mkt_cap}\n"
+        f"◽️ *Day Range:* {data.get('dayLow')}p - {data.get('dayHigh')}p\n"
         f"-----------\n"
     )
     return report
