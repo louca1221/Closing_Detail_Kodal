@@ -71,7 +71,7 @@ def get_kod_report():
         f"◽️ *Market Cap:* £{mkt_cap}\n"
         f"-----------\n"
         f"◽️ *Value Traded:* £{total_value_gbp:,.2f}\n"
-        f"◽️ *Day Range:* {data.get('dayLow')}p - {data.get('dayHigh')}p\n"
+        f"◽️ *Day Range:* {y_data.get('dayLow')}p - {y_data.get('dayHigh')}p\n"
         f"-----------\n"
     )
     return report
