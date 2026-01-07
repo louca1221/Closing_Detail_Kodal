@@ -15,7 +15,7 @@ def get_marketstack_price():
         
     try:
         # Note: Free plan users MUST use http instead of https
-        url = f"http://api.marketstack.com/v1/eod/latest?access_key={MS_KEY}&symbols=KOD.XLON"
+        url = f"http://api.marketstack.com/v1/eod/latest?access_key={MS_KEY}&symbols=KOD.L"
         response = requests.get(url)
         data_json = response.json()
         
