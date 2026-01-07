@@ -46,7 +46,7 @@ def get_kod_report():
         f"*Kodal Minerals Market Report - {today_str}*\n"
         f"-----------\n"
         f"{emoji} *Price:* {price}p ({change_pct:+.2f}%)\n"
-        f"*Source:* Yahoo Finance (Live)\n"
+        f"*Source:* Yahoo Finance\n"
         f"-----------\n"
         f"◽️ *Today's Volume:* {vol_today:,}\n"
         f"◽️ *10D Avg:* {int(avg_vol_10d):,}\n"
