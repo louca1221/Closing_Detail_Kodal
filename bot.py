@@ -64,18 +64,27 @@ def send_telegram_msg(text):
         print("Error: TOKEN or CHAT_ID is missing.")
         return
         
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID, 
-        "text": text, 
-        "parse_mode": "Markdown"
-    }
+    # Split the CHAT_ID by comma in case there are multiple
+    chat_ids = CHAT_ID.split(',')
     
-    r = requests.post(url, data=payload)
-    if r.status_code != 200:
-        print(f"❌ Telegram Error: {r.text}")
-    else:
-        print("✅ Message sent successfully!")
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    
+    for current_id in chat_ids:
+        # Strip whitespace to handle cases like "12345, 67890"
+        clean_id = current_id.strip()
+        
+        payload = {
+            "chat_id": clean_id, 
+            "text": text, 
+            "parse_mode": "Markdown"
+        }
+        
+        r = requests.post(url, data=payload)
+        
+        if r.status_code != 200:
+            print(f"❌ Error for Chat ID {clean_id}: {r.text}")
+        else:
+            print(f"✅ Message sent successfully to {clean_id}!")
 
 if __name__ == "__main__":
     try:
