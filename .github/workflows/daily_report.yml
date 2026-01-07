@@ -20,4 +20,5 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
+          MARKETSTACK_KEY: ${{ secrets.MARKETSTACK_KEY }}
         run: python bot.py
