@@ -8,15 +8,26 @@ CHAT_ID = os.getenv('CHAT_ID')
 MS_KEY = os.getenv('MARKETSTACK_KEY') # Your new Marketstack Key
 
 def get_marketstack_price():
-    """Fetches the official EOD closing price from Marketstack"""
+    """Fetches the official EOD closing price with error handling"""
+    if not MS_KEY:
+        print("Error: MARKETSTACK_KEY is missing from GitHub Secrets.")
+        return None
+        
     try:
-        # Kodal symbol on Marketstack for LSE is KOD.XLON
+        # Note: Free plan users MUST use http instead of https
         url = f"http://api.marketstack.com/v1/eod/latest?access_key={MS_KEY}&symbols=KOD.XLON"
-        response = requests.get(url).json()
-        # Marketstack provides price in local currency units (pennies for LSE)
-        return response['data'][0]['close']
+        response = requests.get(url)
+        data_json = response.json()
+        
+        # Check if 'data' exists in the response
+        if 'data' in data_json and len(data_json['data']) > 0:
+            return data_json['data'][0]['close']
+        else:
+            # This will print the actual error message from Marketstack in your GitHub logs
+            print(f"Marketstack API Error: {data_json.get('error', 'Unknown Error')}")
+            return None
     except Exception as e:
-        print(f"Marketstack Error: {e}")
+        print(f"Connection Error: {e}")
         return None
 
 def get_kod_report():
