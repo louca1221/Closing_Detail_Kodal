@@ -14,7 +14,7 @@ def get_marketstack_price():
         return None
     try:
         # Reverted back to KOD.L based on your testing
-        url = f"http://api.marketstack.com/v1/eod/latest?access_key={MS_KEY}&symbols=KOD.L"
+        url = f"http://api.marketstack.com/v2/intraday?access_key={MS_KEY}&symbols=KOD.L"
         response = requests.get(url)
         data_json = response.json()
         
