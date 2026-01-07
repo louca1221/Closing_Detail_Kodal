@@ -43,7 +43,7 @@ def get_kod_report():
     # Determine which price to use
     # If Marketstack provides a price, we use it. Otherwise, Yahoo is our safety.
     price = ms_price if ms_price else (y_data.get('regularMarketPrice') or y_data.get('currentPrice') or 0)
-    price_source = "Marketstack" if ms_price else "Yahoo Finance"
+    price_source = "Yahoo Finance" if ms_price else "Yahoo Finance"
     
     prev_close = y_data.get('previousClose') or 0
     vol_today = y_data.get('regularMarketVolume') or 0
