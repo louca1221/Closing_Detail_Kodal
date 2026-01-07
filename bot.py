@@ -5,14 +5,30 @@ import pandas as pd
 
 TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
+MS_KEY = os.getenv('MARKETSTACK_KEY') # Your new Marketstack Key
+
+def get_marketstack_price():
+    """Fetches the official EOD closing price from Marketstack"""
+    try:
+        # Kodal symbol on Marketstack for LSE is KOD.XLON
+        url = f"http://api.marketstack.com/v1/eod/latest?access_key={MS_KEY}&symbols=KOD.XLON"
+        response = requests.get(url).json()
+        # Marketstack provides price in local currency units (pennies for LSE)
+        return response['data'][0]['close']
+    except Exception as e:
+        print(f"Marketstack Error: {e}")
+        return None
 
 def get_kod_report():
     print("Fetching data for Kodal Minerals...")
     ticker = yf.Ticker("KOD.L")
     
+    # 1. GET PRICE FROM MARKETSTACK
+    ms_price = get_marketstack_price()
+    
     # Get current info
     data = ticker.info
-    price = data.get('regularMarketPrice') or data.get('currentPrice') or 0
+    price = ms_price if ms_price else (data.get('regularMarketPrice') or 0)
     prev_close = data.get('previousClose') or 0
     vol_today = data.get('regularMarketVolume') or 0
     
