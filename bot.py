@@ -63,7 +63,8 @@ def get_kod_report():
     today_str = datetime.now().strftime('%d %b %Y')
 
     report = (
-        f"*Kodal Minerals (KOD.L) - {today_str}*\n"
+        f"*Kodal Minerals - Market Close Report*\n"
+        f"{today_str}\n"
         f"-----------\n"
         f"{emoji} *Price:* {price}p ({change_pct:+.2f}%)\n"
         f"*Source:* {price_source} ({ms_date if ms_date else 'Live'})\n"
