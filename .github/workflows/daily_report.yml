@@ -23,5 +23,3 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python bot.py
-      - name: Keepalive Workflow
-        uses: gautamkrishnar/keepalive-workflow@v2
